@@ -21,6 +21,7 @@ class UserRegistrationTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn('username', response.data)
 
+
 class UserLoginTest(APITestCase):
     def setUp(self):
         self.user_data = {
@@ -41,6 +42,7 @@ class UserLoginTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('access', response.data)
         self.assertIn('refresh', response.data)
+
 
 class AuthorAPITest(APITestCase):
     def setUp(self):
@@ -80,6 +82,7 @@ class AuthorAPITest(APITestCase):
         url = reverse('author-detail', args=[self.author.id])
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
 
 class BookAPITest(APITestCase):
     def setUp(self):
@@ -129,6 +132,7 @@ class BookAPITest(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+
 class AuthorPermissionTest(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='user', password='userpass123')
@@ -153,6 +157,7 @@ class AuthorPermissionTest(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+
 class UserRegistrationNegativeTest(APITestCase):
     def test_passwords_must_match(self):
         url = reverse('register')
@@ -164,6 +169,7 @@ class UserRegistrationNegativeTest(APITestCase):
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class UserLoginNegativeTest(APITestCase):
     def setUp(self):
@@ -222,3 +228,94 @@ class BookImageUploadTest(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertIn('cover', response.data)
         self.assertTrue(response.data['cover'].endswith('.jpg'))
+
+
+class AuthorFilterSearchTest(APITestCase):
+    def setUp(self):
+        self.admin_user = User.objects.create_superuser(
+            username='admin',
+            email='admin@example.com',
+            password='adminpass123'
+        )
+        refresh = RefreshToken.for_user(self.admin_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+
+        # Создаем несколько авторов
+        Author.objects.create(first_name='John', last_name='Doe', birth_date='1970-01-01')
+        Author.objects.create(first_name='Jane', last_name='Smith', birth_date='1980-05-05')
+        Author.objects.create(first_name='Alice', last_name='Johnson', birth_date='1990-07-15')
+
+    def test_filter_by_first_name(self):
+        url = reverse('author-list') + '?first_name=Jane'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['first_name'], 'Jane')
+
+    def test_filter_by_birth_date(self):
+        url = reverse('author-list') + '?birth_date=1970-01-01'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['birth_date'], '1970-01-01')
+
+    def test_search_by_last_name(self):
+        url = reverse('author-list') + '?search=Johnson'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['last_name'], 'Johnson')
+
+
+class BookFilterSearchTest(APITestCase):
+    def setUp(self):
+        self.admin_user = User.objects.create_superuser(
+            username='admin',
+            email='admin@example.com',
+            password='adminpass123'
+        )
+        refresh = RefreshToken.for_user(self.admin_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+
+        # Создаем авторов
+        author1 = Author.objects.create(first_name='John', last_name='Doe')
+        author2 = Author.objects.create(first_name='Jane', last_name='Smith')
+
+        # Создаем книги
+        book1 = Book.objects.create(title='Django for Beginners', genre='Education', published_date='2020-01-01', description='A book about Django.')
+        book1.authors.add(author1)
+
+        book2 = Book.objects.create(title='Advanced Django', genre='Education', published_date='2021-06-15', description='Advanced topics in Django.')
+        book2.authors.add(author2)
+
+        book3 = Book.objects.create(title='Mystery Novel', genre='Fiction', published_date='2019-10-10', description='A thrilling mystery.')
+        book3.authors.add(author1)
+
+    def test_filter_by_genre(self):
+        url = reverse('book-list') + '?genre=Education'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        for book in response.data:
+            self.assertEqual(book['genre'], 'Education')
+
+    def test_filter_by_published_date(self):
+        url = reverse('book-list') + '?published_date=2019-10-10'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['published_date'], '2019-10-10')
+
+    def test_filter_by_author_first_name(self):
+        url = reverse('book-list') + '?authors__first_name=Jane'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['title'], 'Advanced Django')
+
+    def test_search_by_title(self):
+        url = reverse('book-list') + '?search=Mystery'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['title'], 'Mystery Novel')

@@ -1,0 +1,19 @@
+{% extends "library_app/base.html" %}
+
+{% block title %}Books{% endblock %}
+
+{% block content %}
+<h1>Books</h1>
+<ul class="list-group">
+    {% for book in books %}
+        <li class="list-group-item">
+            <strong>{{ book.title }}</strong> by
+            {% for author in book.authors.all %}
+                {{ author.first_name }} {{ author.last_name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </li>
+    {% empty %}
+        <li class="list-group-item">No books found.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
