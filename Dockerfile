@@ -35,3 +35,6 @@ EXPOSE 8000
 
 # Команда для запуска приложения
 ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Команда для сбора статистики
+RUN python manage.py collectstatic --noinput

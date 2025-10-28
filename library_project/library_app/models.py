@@ -5,6 +5,7 @@ class Author(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     birth_date = models.DateField(null=True, blank=True)
+    photo = models.ImageField(upload_to='authors/photos/', null=True, blank=True)
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
@@ -15,6 +16,7 @@ class Book(models.Model):
     genre = models.CharField(max_length=100, blank=True)
     published_date = models.DateField(null=True, blank=True)
     description = models.TextField(blank=True)
+    cover = models.ImageField(upload_to='books/covers/', null=True, blank=True)
 
     def __str__(self):
         return self.title

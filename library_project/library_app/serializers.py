@@ -2,27 +2,29 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Author, Book, BookIssue
 
+
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = '__all__'
 
+
 class BookSerializer(serializers.ModelSerializer):
-    # Для записи авторов через их ID
     author_ids = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Author.objects.all(), write_only=True, source='authors'
     )
-    # Для чтения
     authors = AuthorSerializer(many=True, read_only=True)
 
     class Meta:
         model = Book
-        fields = ['id', 'title', 'authors', 'author_ids', 'genre', 'published_date', 'description']
+        fields = ['id', 'title', 'authors', 'author_ids', 'genre', 'published_date', 'description', 'cover']
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email']
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
@@ -41,6 +43,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         validated_data.pop('password2')
         user = User.objects.create_user(**validated_data)
         return user
+
 
 class BookIssueSerializer(serializers.ModelSerializer):
     book = BookSerializer(read_only=True)
