@@ -4,8 +4,9 @@ from django.db.models import Avg
 
 
 class Author(models.Model):
-    """Модель автора книги"""
-
+    """
+    Модель автора книги.
+    """
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     birth_date = models.DateField(null=True, blank=True)
@@ -16,16 +17,16 @@ class Author(models.Model):
 
     @property
     def average_rating(self):
-        """Возвращает средний рейтинг всех книг автора"""
         ratings = Rating.objects.filter(book__authors=self)
         if ratings.exists():
-            return ratings.aggregate(Avg("score"))["score__avg"]
+            return ratings.aggregate(models.Avg("score"))["score__avg"]
         return None
 
 
 class Book(models.Model):
-    """Модель книги"""
-
+    """
+    Модель книги.
+    """
     title = models.CharField(max_length=255)
     authors = models.ManyToManyField(Author, related_name="books")
     genre = models.CharField(max_length=100, blank=True)
@@ -38,18 +39,16 @@ class Book(models.Model):
 
     @property
     def average_rating(self):
-        """Возвращает средний рейтинг книги"""
         result = self.ratings.aggregate(Avg("score"))
         return result["score__avg"] or 0
 
 
 class BookIssue(models.Model):
-    """Модель выдачи книги пользователю."""
-
+    """
+    Модель выдачи книги пользователю.
+    """
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="issues")
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="issued_books"
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="issued_books")
     issue_date = models.DateField(auto_now_add=True)
     rental_period = models.PositiveIntegerField(default=14)
     due_date = models.DateField()
@@ -57,7 +56,6 @@ class BookIssue(models.Model):
 
     @property
     def is_returned(self):
-        """Возвращает True, если книга возвращена."""
         return self.return_date is not None
 
     def __str__(self):
@@ -65,8 +63,9 @@ class BookIssue(models.Model):
 
 
 class Rating(models.Model):
-    """Модель рейтинга книги."""
-
+    """
+    Модель рейтинга книги.
+    """
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="ratings")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ratings")
     score = models.PositiveSmallIntegerField()
@@ -81,8 +80,9 @@ class Rating(models.Model):
 
 
 class Comment(models.Model):
-    """Модель комментария к книге."""
-
+    """
+    Модель комментария к книге.
+    """
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     text = models.TextField()

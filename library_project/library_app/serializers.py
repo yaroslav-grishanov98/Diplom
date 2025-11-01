@@ -1,21 +1,27 @@
+# library_app/serializers.py
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Author, Book, BookIssue, Comment, Rating
 
 
 class AuthorSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Author"""
-
+    """
+    Сериализатор для модели Author.
+    """
     class Meta:
         model = Author
         fields = "__all__"
 
 
 class BookSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Book."""
-
+    """
+    Сериализатор для модели Book.
+    """
     author_ids = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Author.objects.all(), write_only=True, source="authors"
+        many=True,
+        queryset=Author.objects.all(),
+        write_only=True,
+        source="authors"
     )
     authors = AuthorSerializer(many=True, read_only=True)
 
@@ -34,21 +40,27 @@ class BookSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели User"""
-
+    """
+    Сериализатор для модели User.
+    """
     class Meta:
         model = User
         fields = ["id", "username", "email"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    """Сериализатор для регистрации пользователя."""
-
+    """
+    Сериализатор для регистрации пользователя.
+    """
     password = serializers.CharField(
-        write_only=True, required=True, style={"input_type": "password"}
+        write_only=True,
+        required=True,
+        style={"input_type": "password"},
     )
     password2 = serializers.CharField(
-        write_only=True, required=True, style={"input_type": "password"}
+        write_only=True,
+        required=True,
+        style={"input_type": "password"},
     )
 
     class Meta:
@@ -67,15 +79,21 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class BookIssueSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели BookIssue."""
-
+    """
+    Сериализатор для модели BookIssue.
+    """
     book = BookSerializer(read_only=True)
     book_id = serializers.PrimaryKeyRelatedField(
-        queryset=Book.objects.all(), source="book", write_only=True
+        queryset=Book.objects.all(),
+        source="book",
+        write_only=True,
     )
     user = UserSerializer(read_only=True)
     user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source="user", write_only=True, required=False
+        queryset=User.objects.all(),
+        source="user",
+        write_only=True,
+        required=False,
     )
 
     class Meta:
@@ -95,8 +113,9 @@ class BookIssueSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Comment."""
-
+    """
+    Сериализатор для модели Comment.
+    """
     user = serializers.ReadOnlyField(source="user.username")
     book = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all())
 
@@ -106,8 +125,9 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class RatingSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Rating."""
-
+    """
+    Сериализатор для модели Rating.
+    """
     user = serializers.ReadOnlyField(source="user.username")
     book = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all())
 
@@ -117,7 +137,7 @@ class RatingSerializer(serializers.ModelSerializer):
 
     def validate_score(self, value):
         if not 1 <= value <= 5:
-            raise serializers.ValidationError("Оценка должна быть от 1 до 5.")
+            raise serializers.ValidationError("Оценка от 1 до 5")
         return value
 
     def validate(self, data):
