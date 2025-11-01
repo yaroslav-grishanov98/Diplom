@@ -1,0 +1,13 @@
+{% extends "library_app/base.html" %}
+
+{% block title %}Добро пожаловать в библиотеку!{% endblock %}
+
+{% block content %}
+<h1>Добро пожаловать в библиотеку!</h1>
+<p>Познакомьтесь с нашей коллекцией книг и авторов.</p>
+
+<ul>
+    <li><a href="{% url 'book_list' %}">Книги</a></li>
+    <li><a href="{% url 'author_list' %}">Авторы</a></li>
+</ul>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "library_app/base.html" %}
+
+{% block title %}Вход для посетителей{% endblock %}
+
+{% block content %}
+<h2>Вход для посетителей</h2>
+<form method="post">
+    {% csrf_token %}
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <div class="mb-3">
+        <label for="username" class="form-label">Имя</label>
+        <input type="text" name="username" id="username" class="form-control" placeholder="Enter your name" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Войти</button>
+</form>
+{% endblock %}>

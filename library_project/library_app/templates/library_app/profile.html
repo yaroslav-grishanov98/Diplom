@@ -1,0 +1,20 @@
+{% extends "library_app/base.html" %}
+
+{% block title %}Ваш профиль{% endblock %}
+
+{% block content %}
+<h1>Ваши взятые напрокат книги</h1>
+
+{% if active_issues %}
+    <ul class="list-group">
+        {% for issue in active_issues %}
+            <li class="list-group-item">
+                <strong>{{ issue.book.title }}</strong> — due on {{ issue.due_date }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Вы не брали напрокат ни одной книги.</p>
+{% endif %}
+
+{% endblock %}

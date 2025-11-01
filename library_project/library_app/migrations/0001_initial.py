@@ -15,34 +15,77 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Author',
+            name="Author",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('first_name', models.CharField(max_length=100)),
-                ('last_name', models.CharField(max_length=100)),
-                ('birth_date', models.DateField(blank=True, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("first_name", models.CharField(max_length=100)),
+                ("last_name", models.CharField(max_length=100)),
+                ("birth_date", models.DateField(blank=True, null=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Book',
+            name="Book",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=255)),
-                ('genre', models.CharField(blank=True, max_length=100)),
-                ('published_date', models.DateField(blank=True, null=True)),
-                ('description', models.TextField(blank=True)),
-                ('authors', models.ManyToManyField(related_name='books', to='library_app.author')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("genre", models.CharField(blank=True, max_length=100)),
+                ("published_date", models.DateField(blank=True, null=True)),
+                ("description", models.TextField(blank=True)),
+                (
+                    "authors",
+                    models.ManyToManyField(
+                        related_name="books", to="library_app.author"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='BookIssue',
+            name="BookIssue",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('issue_date', models.DateField(auto_now_add=True)),
-                ('due_date', models.DateField()),
-                ('return_date', models.DateField(blank=True, null=True)),
-                ('book', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='issues', to='library_app.book')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='issued_books', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("issue_date", models.DateField(auto_now_add=True)),
+                ("due_date", models.DateField()),
+                ("return_date", models.DateField(blank=True, null=True)),
+                (
+                    "book",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="issues",
+                        to="library_app.book",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="issued_books",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

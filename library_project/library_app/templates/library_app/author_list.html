@@ -1,0 +1,22 @@
+{% extends "library_app/base.html" %}
+
+{% block title %}Авторы{% endblock %}
+
+{% block content %}
+<h1>Авторы</h1>
+
+<form method="get" action="{% url 'author_list' %}" class="mb-3">
+    <input type="text" name="search" placeholder="Search authors..." value="{{ search }}" class="form-control" />
+    <button type="submit" class="btn btn-primary mt-2">Поиск</button>
+</form>
+
+<ul class="list-group">
+    {% for author in authors %}
+        <li class="list-group-item">
+            <a href="{% url 'author_detail' author.id %}">{{ author.first_name }} {{ author.last_name }}</a>
+        </li>
+    {% empty %}
+        <li class="list-group-item">Авторы не найдены.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
