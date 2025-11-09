@@ -1,6 +1,7 @@
 # library_app/serializers.py
-from rest_framework import serializers
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
 from .models import Author, Book, BookIssue, Comment, Rating
 
 
@@ -8,6 +9,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     """
     Сериализатор для модели Author.
     """
+
     class Meta:
         model = Author
         fields = "__all__"
@@ -17,11 +19,9 @@ class BookSerializer(serializers.ModelSerializer):
     """
     Сериализатор для модели Book.
     """
+
     author_ids = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Author.objects.all(),
-        write_only=True,
-        source="authors"
+        many=True, queryset=Author.objects.all(), write_only=True, source="authors"
     )
     authors = AuthorSerializer(many=True, read_only=True)
 
@@ -43,6 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
     Сериализатор для модели User.
     """
+
     class Meta:
         model = User
         fields = ["id", "username", "email"]
@@ -52,6 +53,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     """
     Сериализатор для регистрации пользователя.
     """
+
     password = serializers.CharField(
         write_only=True,
         required=True,
@@ -82,6 +84,7 @@ class BookIssueSerializer(serializers.ModelSerializer):
     """
     Сериализатор для модели BookIssue.
     """
+
     book = BookSerializer(read_only=True)
     book_id = serializers.PrimaryKeyRelatedField(
         queryset=Book.objects.all(),
@@ -116,6 +119,7 @@ class CommentSerializer(serializers.ModelSerializer):
     """
     Сериализатор для модели Comment.
     """
+
     user = serializers.ReadOnlyField(source="user.username")
     book = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all())
 
@@ -128,6 +132,7 @@ class RatingSerializer(serializers.ModelSerializer):
     """
     Сериализатор для модели Rating.
     """
+
     user = serializers.ReadOnlyField(source="user.username")
     book = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all())
 

@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.db.models import Avg
 
 
@@ -7,10 +7,12 @@ class Author(models.Model):
     """
     Модель автора книги.
     """
+
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     birth_date = models.DateField(null=True, blank=True)
-    photo = models.ImageField(upload_to="authors/photos/", null=True, blank=True)
+    photo = models.ImageField(
+        upload_to="authors/photos/", null=True, blank=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -27,6 +29,7 @@ class Book(models.Model):
     """
     Модель книги.
     """
+
     title = models.CharField(max_length=255)
     authors = models.ManyToManyField(Author, related_name="books")
     genre = models.CharField(max_length=100, blank=True)
@@ -47,8 +50,12 @@ class BookIssue(models.Model):
     """
     Модель выдачи книги пользователю.
     """
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="issues")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="issued_books")
+
+    book = models.ForeignKey(
+        Book, on_delete=models.CASCADE, related_name="issues")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="issued_books"
+    )
     issue_date = models.DateField(auto_now_add=True)
     rental_period = models.PositiveIntegerField(default=14)
     due_date = models.DateField()
@@ -66,8 +73,11 @@ class Rating(models.Model):
     """
     Модель рейтинга книги.
     """
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="ratings")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ratings")
+
+    book = models.ForeignKey(
+        Book, on_delete=models.CASCADE, related_name="ratings")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="ratings")
     score = models.PositiveSmallIntegerField()
     review = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -83,8 +93,11 @@ class Comment(models.Model):
     """
     Модель комментария к книге.
     """
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="comments")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+
+    book = models.ForeignKey(
+        Book, on_delete=models.CASCADE, related_name="comments")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="comments")
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

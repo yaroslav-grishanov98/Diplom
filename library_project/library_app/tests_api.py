@@ -1,10 +1,11 @@
-from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.urls import reverse
-from rest_framework import status
-from .models import Author, Book, Comment, Rating, BookIssue
 from django.utils import timezone
+from rest_framework import status
+from rest_framework.test import APITestCase
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from .models import Author, Book, BookIssue, Comment, Rating
 
 
 class UserRegistrationTest(APITestCase):
@@ -55,7 +56,8 @@ class AuthorAPITest(APITestCase):
             "admin", "admin@example.com", "adminpass"
         )
         refresh = RefreshToken.for_user(self.admin_user)
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
         self.author_data = {
             "first_name": "Jane",
             "last_name": "Smith",
@@ -68,7 +70,8 @@ class AuthorAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_get_authors(self):
-        self.client.post(reverse("author-list"), self.author_data, format="json")
+        self.client.post(reverse("author-list"),
+                         self.author_data, format="json")
         response = self.client.get(reverse("author-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreaterEqual(len(response.data), 1)
@@ -82,7 +85,8 @@ class BookAPITest(APITestCase):
             "admin", "admin@example.com", "adminpass"
         )
         refresh = RefreshToken.for_user(self.admin_user)
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
         self.author = Author.objects.create(first_name="John", last_name="Doe")
         self.book_data = {
             "title": "Test Book",
@@ -108,9 +112,11 @@ class CommentAPITest(APITestCase):
     """Тесты создания комментариев к книгам."""
 
     def setUp(self):
-        self.user = User.objects.create_user(username="user1", password="pass12345")
+        self.user = User.objects.create_user(
+            username="user1", password="pass12345")
         refresh = RefreshToken.for_user(self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
         self.author = Author.objects.create(first_name="John", last_name="Doe")
         self.book = Book.objects.create(
             title="Test Book",
@@ -131,9 +137,11 @@ class RatingAPITest(APITestCase):
     """Тесты создания и обновления рейтингов книг."""
 
     def setUp(self):
-        self.user = User.objects.create_user(username="user1", password="pass12345")
+        self.user = User.objects.create_user(
+            username="user1", password="pass12345")
         refresh = RefreshToken.for_user(self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
         self.author = Author.objects.create(first_name="John", last_name="Doe")
         self.book = Book.objects.create(
             title="Test Book",
@@ -167,16 +175,19 @@ class RatingAPITest(APITestCase):
         rating_id = response.data["id"]
         delete_url = reverse("rating-detail", args=[rating_id])
         response_delete = self.client.delete(delete_url)
-        self.assertEqual(response_delete.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response_delete.status_code,
+                         status.HTTP_204_NO_CONTENT)
 
 
 class ProfileAPITest(APITestCase):
     """Тесты личного кабинета пользователя."""
 
     def setUp(self):
-        self.user = User.objects.create_user(username="user1", password="pass12345")
+        self.user = User.objects.create_user(
+            username="user1", password="pass12345")
         refresh = RefreshToken.for_user(self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
         self.author = Author.objects.create(first_name="John", last_name="Doe")
         self.book = Book.objects.create(
             title="Test Book",

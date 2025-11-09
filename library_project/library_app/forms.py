@@ -1,5 +1,6 @@
 from django import forms
-from .models import Book, Author
+
+from .models import Author, Book
 
 
 class BookForm(forms.ModelForm):

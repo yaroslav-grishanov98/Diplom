@@ -1,8 +1,9 @@
-from django.test import TestCase, Client
 from django.contrib.auth.models import User
+from django.test import Client, TestCase
 from django.urls import reverse
-from .models import Author, Book, BookIssue
 from django.utils import timezone
+
+from .models import Author, Book, BookIssue
 
 
 class AuthorWebTest(TestCase):
@@ -13,7 +14,8 @@ class AuthorWebTest(TestCase):
         self.admin_user = User.objects.create_superuser(
             "admin", "admin@example.com", "adminpass"
         )
-        self.user = User.objects.create_user("user", "user@example.com", "userpass")
+        self.user = User.objects.create_user(
+            "user", "user@example.com", "userpass")
         self.author = Author.objects.create(first_name="John", last_name="Doe")
 
     def test_delete_author_as_admin(self):
@@ -37,7 +39,8 @@ class BookWebTest(TestCase):
         self.admin_user = User.objects.create_superuser(
             "admin", "admin@example.com", "adminpass"
         )
-        self.user = User.objects.create_user("user", "user@example.com", "userpass")
+        self.user = User.objects.create_user(
+            "user", "user@example.com", "userpass")
         self.author = Author.objects.create(first_name="John", last_name="Doe")
         self.book = Book.objects.create(
             title="Test Book",
@@ -65,7 +68,8 @@ class ProfileWebTest(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(username="user1", password="pass123")
+        self.user = User.objects.create_user(
+            username="user1", password="pass123")
         self.admin_user = User.objects.create_superuser(
             username="admin", email="admin@example.com", password="adminpass"
         )

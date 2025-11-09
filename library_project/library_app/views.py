@@ -1,32 +1,24 @@
-from django.db.models import Q
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from django.contrib.auth import login, get_user_model
+from django.contrib.auth import get_user_model, login
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group
-from rest_framework import viewsets, generics, filters, permissions
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
-from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.views import APIView
-from rest_framework import status
-from django.views.decorators.http import require_POST
+from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_POST
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, generics, permissions, status, viewsets
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from .forms import AuthorForm, BookForm
 from .models import Author, Book, BookIssue, Comment, Rating
-from .serializers import (
-    AuthorSerializer,
-    BookSerializer,
-    UserSerializer,
-    RegisterSerializer,
-    BookIssueSerializer,
-    CommentSerializer,
-    RatingSerializer,
-)
 from .permissions import IsAdminOrReadOnly, IsOwnerOrAdmin, IsOwnerOrReadOnly
-from .forms import BookForm, AuthorForm
+from .serializers import (AuthorSerializer, BookIssueSerializer,
+                          BookSerializer, CommentSerializer, RatingSerializer,
+                          RegisterSerializer, UserSerializer)
 from .utils import send_rental_confirmation_email
-
 
 User = get_user_model()
 
@@ -113,7 +105,8 @@ class BookViewSet(viewsets.ModelViewSet):
         "authors__first_name",
         "authors__last_name",
     ]
-    search_fields = ["title", "genre", "authors__first_name", "authors__last_name"]
+    search_fields = ["title", "genre",
+                     "authors__first_name", "authors__last_name"]
 
 
 class BookIssueViewSet(viewsets.ModelViewSet):
@@ -148,7 +141,8 @@ def book_list(request):
     else:
         books = Book.objects.all().prefetch_related("authors")
     return render(
-        request, "library_app/book_list.html", {"books": books, "search": query}
+        request, "library_app/book_list.html", {
+            "books": books, "search": query}
     )
 
 
@@ -162,7 +156,8 @@ def author_list(request):
     else:
         authors = Author.objects.all()
     return render(
-        request, "library_app/author_list.html", {"authors": authors, "search": query}
+        request, "library_app/author_list.html", {
+            "authors": authors, "search": query}
     )
 
 
@@ -174,7 +169,8 @@ def index(request):
 def book_detail(request, pk):
     """Веб-вью для отображения деталей книги, среднего рейтинга и комментариев."""
     book = get_object_or_404(Book, pk=pk)
-    average_rating = book.average_rating if hasattr(book, "average_rating") else None
+    average_rating = book.average_rating if hasattr(
+        book, "average_rating") else None
     comments = book.comments.all()
     return render(
         request,
@@ -298,7 +294,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -309,7 +306,8 @@ class RatingViewSet(viewsets.ModelViewSet):
 
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -337,7 +335,8 @@ def book_issue_create(request, book_id):
         book=book, user=request.user, due_date=due_date, rental_period=rental_period
     )
     send_rental_confirmation_email(request.user, book, due_date)
-    messages.success(request, f'Вы арендовали книгу "{book.title}" до {due_date}.')
+    messages.success(
+        request, f'Вы арендовали книгу "{book.title}" до {due_date}.')
     return redirect("profile")
 
 
