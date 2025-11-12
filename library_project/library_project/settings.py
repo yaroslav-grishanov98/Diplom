@@ -1,13 +1,12 @@
 import os
 from datetime import timedelta
 from pathlib import Path
-from celery.schedules import crontab
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-u72-6-39@pj*-05pr^f%$3w-(-59sc6cti1yq!_0eede%_e5g$"
-DEBUG = True
-ALLOWED_HOSTS = []
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-secret-key-for-development-only")
+DEBUG = os.getenv("DEBUG", "True") == "True"
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -20,11 +19,12 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "drf_yasg",
     "django_filters",
+    "corsheaders",
     "library_app",
-    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -56,11 +56,11 @@ WSGI_APPLICATION = "library_project.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "diplom"),
-        "USER": os.getenv("DB_USER", "yaroslav"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "122406"),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
     }
 }
 
@@ -118,13 +118,6 @@ LOGOUT_REDIRECT_URL = "/"
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_SERIALIZER = "json"
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 
-CELERY_BEAT_SCHEDULE = {
-    "send-habit-reminders-every-day": {
-        "task": "library_app.tasks.send_habit_reminders",
-        "schedule": crontab(hour=9, minute=0),  # Каждый день в 09:00 утра
-    },
-}
