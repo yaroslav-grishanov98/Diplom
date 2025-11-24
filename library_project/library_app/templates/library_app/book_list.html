@@ -1,0 +1,25 @@
+{% extends "library_app/base.html" %}
+
+{% block title %}Книги{% endblock %}
+
+{% block content %}
+<h1>Книги</h1>
+
+<form method="get" action="{% url 'book_list' %}" class="mb-3">
+    <input type="text" name="search" placeholder="Search books..." value="{{ search }}" class="form-control" />
+    <button type="submit" class="btn btn-primary mt-2">Поиск</button>
+</form>
+
+<ul class="list-group">
+    {% for book in books %}
+        <li class="list-group-item">
+            <a href="{% url 'book_detail' book.id %}">{{ book.title }}</a> by
+            {% for author in book.authors.all %}
+                {{ author.first_name }} {{ author.last_name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </li>
+    {% empty %}
+        <li class="list-group-item">Книга не найдена.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

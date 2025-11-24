@@ -1,0 +1,32 @@
+{% extends "library_app/base.html" %}
+
+{% block title %}{{ author.first_name }} {{ author.last_name }}{% endblock %}
+
+{% block content %}
+<h1>{{ author.first_name }} {{ author.last_name }}</h1>
+<p><strong>Дата рождения:</strong> {{ author.birth_date }}</p>
+
+{% if author.photo %}
+<img src="{{ author.photo.url }}" alt="{{ author.first_name }} {{ author.last_name }}" style="max-width: 200px;">
+{% endif %}
+
+<h2>Книги автора:</h2>
+<ul>
+    {% for book in author.books.all %}
+        <li><a href="{% url 'book_detail' book.id %}">{{ book.title }}</a></li>
+    {% empty %}
+        <li>Книга не найдена.</li>
+    {% endfor %}
+</ul>
+
+{% if user.is_staff %}
+    <a href="{% url 'author_edit' author.id %}" class="btn btn-warning">Редактировать</a>
+
+    <form action="{% url 'author_delete' author.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Удалить</button>
+    </form>
+{% endif %}
+
+<a href="{% url 'author_list' %}" class="btn btn-secondary">Вернутся к списку авторов</a>
+{% endblock %}
